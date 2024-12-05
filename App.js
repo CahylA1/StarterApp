@@ -1,20 +1,79 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react';
+import { StyleSheet, ImageBackground, SafeAreaView} from 'react-native';
+import StartGameScreen from './screens/StartGameScreen';
+import { LinearGradient } from 'expo-linear-gradient'
+import GameScreen from './screens/GameScreen';
+import GameOverScreen from './screens/GameOverScreen'
+import Colors from './constants/colors';
+import { useFonts } from "expo-font";
+import AppLoading from 'expo-app-loading'
 
 export default function App() {
+  const [userNumber, setUserNumber] = useState(null);
+  const [gameIsOver, setGameIsOver] = useState(true);
+
+  const [fontsLoaded] = useFonts({
+    'open-sans': require('./assets/fonts/OpenSans-Regular.ttf'),
+    'open-sans-bold': require('./assets/fonts/OpenSans-Bold.ttf'),
+
+  })
+
+  if(!fontsLoaded){
+    return <AppLoading />
+  }
+
+  function pickedNumberHandler(pickedNumber) {
+    setUserNumber(pickedNumber);
+    setGameIsOver(false)
+  }
+  
+  function gameOverHandler() {
+    setGameIsOver(true);
+  }
+  // stores the StartGameScreen component inside of a variable
+  // that allows you to hard code into the app as a component using destructering
+  // & allows you set a prop inside of the StartGameScreen component to
+  //  use your pickedNumberHandler function
+  let screen = <StartGameScreen onPickNumber={pickedNumberHandler} />;
+
+  // uses the initiated state value 'userNumber' and checks if number is a valid number
+  // if number is valid it fowards you to the game screen component
+  if (userNumber) {
+    screen = <GameScreen userNumber={userNumber} onGameOver={gameOverHandler}/>;
+  }
+
+  if (gameIsOver && userNumber) {
+    screen = <GameOverScreen />;
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    // Add a Gradient with Expo package (expo install expo-linear-gradient) to use multiple colors for background and other
+    //elements
+    <LinearGradient
+      colors={[Colors.primary800, Colors.accent500]}
+      style={styles.rootScreen}
+    >
+      <ImageBackground
+        source={require("./assets/images/dices.png")}
+        resizeMode="cover"
+        // Adds style to the view
+        style={styles.rootScreen}
+        // Adds style to the Image
+        imageStyle={styles.backgroundImage}
+      >
+        {/* Safe area view allows you to keep contact under the top of your device without 
+        using styling  */}
+        <SafeAreaView style={styles.rootScreen}>{screen}</SafeAreaView>
+      </ImageBackground>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  rootScreen: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
+  backgroundImage: {
+    opacity: 0.15
+  }
 });
