@@ -9,8 +9,10 @@ import { useFonts } from "expo-font";
 import AppLoading from 'expo-app-loading'
 
 export default function App() {
+  // State
   const [userNumber, setUserNumber] = useState(null);
   const [gameIsOver, setGameIsOver] = useState(true);
+  const [guessRounds, setGuessRounds] = useState(0)
 
   const [fontsLoaded] = useFonts({
     'open-sans': require('./assets/fonts/OpenSans-Regular.ttf'),
@@ -22,6 +24,7 @@ export default function App() {
     return <AppLoading />
   }
 
+  // Functions 
   function pickedNumberHandler(pickedNumber) {
     setUserNumber(pickedNumber);
     setGameIsOver(false)
@@ -30,6 +33,12 @@ export default function App() {
   function gameOverHandler() {
     setGameIsOver(true);
   }
+
+  function startNewGameHandler() {
+    setUserNumber(null)
+    setGuessRounds(0)
+  }
+
   // stores the StartGameScreen component inside of a variable
   // that allows you to hard code into the app as a component using destructering
   // & allows you set a prop inside of the StartGameScreen component to
@@ -43,7 +52,13 @@ export default function App() {
   }
 
   if (gameIsOver && userNumber) {
-    screen = <GameOverScreen />;
+    screen = (
+      <GameOverScreen
+        userNumber={userNumber}
+        roundsNumber={guessRounds}
+        onStartNewGame={startNewGameHandler}
+      />
+    );
   }
 
   return (
