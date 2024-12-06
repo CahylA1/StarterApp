@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Alert} from 'react-native'
+import { View, Text, StyleSheet, Alert, FlatList} from 'react-native'
 import { useState, useEffect } from "react";
 import Title from '../components/ui/Title';
 import NumberContainer from '../components/game/NumberContainer';
@@ -26,7 +26,10 @@ function GameScreen({userNumber, onGameOver}) {
     100,
     userNumber
   );
+
+  // State 
     const [currentGuess, setCurrentGuess] = useState(initialGuess)
+    const [guessRounds, setGuessRounds] = useState([initialGuess])
 
     useEffect(() => {
       if (currentGuess === userNumber) {
@@ -61,6 +64,7 @@ function GameScreen({userNumber, onGameOver}) {
     console.log(minBoundary, maxBoundary)
     const newRndNumber = generateRandomBetween(minBoundary, maxBoundary, currentGuess)
     setCurrentGuess(newRndNumber);
+    setGuessRounds(prevGuessRounds => [newRndNumber, ...prevGuessRounds])
   }
 
 
@@ -69,23 +73,30 @@ function GameScreen({userNumber, onGameOver}) {
         <Title>Opponents Guess</Title>
         <NumberContainer>{currentGuess}</NumberContainer>
         <Card>
-          <InstructionText style={styles.instructionText}>Higher or Lower</InstructionText>
+          <InstructionText style={styles.instructionText}>
+            Higher or Lower
+          </InstructionText>
           <View style={styles.btnsContainer}>
             <View style={styles.btnContainer}>
-                 <PrimaryButton onPress={nextGuessHandler.bind(this, "greater")}>
-              +
-            </PrimaryButton>
+              <PrimaryButton onPress={nextGuessHandler.bind(this, "greater")}>
+                +
+              </PrimaryButton>
             </View>
-          <View style={styles.btnContainer}>
-            <PrimaryButton onPress={nextGuessHandler.bind(this, "lower")}>
-              {/* <Ionicons name='md-remove' size={24} color="white"/> */}
-              -
-            </PrimaryButton>
-          </View>
-            
+            <View style={styles.btnContainer}>
+              <PrimaryButton onPress={nextGuessHandler.bind(this, "lower")}>
+                {/* <Ionicons name='md-remove' size={24} color="white"/> */}-
+              </PrimaryButton>
+            </View>
           </View>
         </Card>
-        {/* <View>LOG ROUNDS</View> */}
+        <View>
+          {/* {guessRounds.map(guessRound =><Text key={guessRound}>{guessRound}</Text>)} */}
+          <FlatList
+            data={guessRounds}
+            renderItem={(itemData) => <Text>{itemData.item}</Text>}
+            keyExtractor={(item) => item}
+          />
+        </View>
       </View>
     );
 }
